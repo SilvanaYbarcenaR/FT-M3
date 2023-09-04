@@ -2,20 +2,60 @@ const fs = require("fs");
 const utils = require("../utils/request");
 const process = require("process");
 
-function pwd() {}
+const pwd = (print) => {
+    print(process.cwd());
+}
 
-function date() {}
+const date = (print) => {
+    print(Date());
+}
 
-function echo() {}
+const echo = (print, args) => {
+    print(args);
+}
 
-function ls() {}
+const ls = (print) => {
+    fs.readdir(".", (error, files) => {
+        if(error) throw Error(error);
+        print(files.join(" "));
+    })
+}
 
-function cat() {}
+const cat = (print, args) => {
+    fs.readFile(args, 'utf-8', (error, data) => {
+        if(error) throw Error(error);
+        print(data);
+    })
+}
 
-function head() {}
+const head = (print, args) => {
+    fs.readFile(args, 'utf-8', (error, data) => {
+        if(error) throw Error(error);
+        print(data.split(/\n/)[0])
+    })
+}
 
-function tail() {}
+const tail = (print, args) => {
+    fs.readFile(args, 'utf-8', (error, data) => {
+        if(error) throw Error(error);
+        print(data.split(/\n/).at(-1).trim())
+    })
+}
 
-function curl() {}
+const curl = (print, args) => {
+    utils.request(`http://${args}`, (error, response) => {
+        if(error) throw Error(error);
+        print(response);
+    })
+}
 
-module.exports = {};
+module.exports = {
+    pwd,
+    date,
+    echo,
+    ls,
+    cat,
+    head,
+    tail,
+    curl
+};

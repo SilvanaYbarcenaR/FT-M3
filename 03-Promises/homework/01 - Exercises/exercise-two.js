@@ -1,6 +1,8 @@
 "use strict";
 
+const { promiseHooks } = require("v8");
 let exerciseUtils = require("./utils");
+const { resolve } = require("path");
 
 let args = process.argv.slice(2).map(function (st) {
   return st.toUpperCase();
@@ -28,6 +30,22 @@ function problemA() {
 
   // promise version
   // Tu código acá:
+  const promises = [
+    exerciseUtils.promisifiedReadFile("poem-two/stanza-01.txt")
+    .then(
+      (stanza1) => {
+        exerciseUtils.blue(stanza1);
+      }
+    ),
+    exerciseUtils.promisifiedReadFile("poem-two/stanza-02.txt")
+    .then(
+      (stanza2) => {
+        exerciseUtils.blue(stanza2);
+      }
+    )
+  ]
+
+  Promise.all(promises);
 }
 
 function problemB() {
@@ -38,21 +56,37 @@ function problemB() {
   filenames[randIdx] = "wrong-file-name-" + (randIdx + 1) + ".txt";
 
   // callback version
-  filenames.forEach((filename) => {
+  /* filenames.forEach((filename) => {
     exerciseUtils.readFile(filename, function (err, stanza) {
       exerciseUtils.blue(stanza);
       if (err) exerciseUtils.magenta(new Error(err));
     });
-  });
+  }); */
 
   // promise version
   // Tu código acá:
+  filenames.forEach((filename) => {
+    exerciseUtils.promisifiedReadFile(filename)
+    .then(
+      (stanza) => {
+        exerciseUtils.blue(stanza);
+      }
+    )
+    .catch( error => exerciseUtils.magenta(new Error(error)))
+  })
 }
 
 // EJERCICIO EXTRA
 function problemC() {
   let fs = require("fs");
-  function promisifiedWriteFile(filename, str) {
+  return function promisifiedWriteFile(filename, str) {
     // tu código acá:
+    return new Promise((resolve, reject) => {
+      fs.writeFile(filename, str, (error) => {
+          return error ? reject(error) : resolve(console.log("File was created"))
+      })
+    })
   }
 }
+
+problemC()("poem-two/prueba1.txt", "línea 1\nLínea 2\nLínea 3")
